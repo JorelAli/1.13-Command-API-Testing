@@ -8,11 +8,15 @@ import io.github.jorelali.commandapi.api.arguments.Argument;
 
 public class Test {
 	
-	String testRequirements;
+	String title;
+	String command;
+	String[] acceptingCases;
 	BiConsumer<CommandAPI, LinkedHashMap<String, Argument>> register;
 
-	public Test(String testRequirements, BiConsumer<CommandAPI, LinkedHashMap<String, Argument>> register) {
-		this.testRequirements = testRequirements;
+	public Test(String title, String command, String[] acceptingCases, BiConsumer<CommandAPI, LinkedHashMap<String, Argument>> register) {
+		this.title = title;
+		this.command = command;
+		this.acceptingCases = acceptingCases;
 		this.register = register;
 	}	
 	

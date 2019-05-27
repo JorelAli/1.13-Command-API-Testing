@@ -6,20 +6,17 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import io.github.jorelali.commandapi.api.CommandAPI;
-import io.github.jorelali.commandapi.api.CommandPermission;
 import io.github.jorelali.commandapi.api.arguments.Argument;
 import io.github.jorelali.commandapi.api.arguments.CustomArgument;
-import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
 import io.github.jorelali.commandapi.api.arguments.CustomArgument.MessageBuilder;
-import io.github.jorelali.commandapi.api.arguments.StringArgument;
-import io.github.jorelali.commandapi.api.arguments.SuggestedStringArgument;
+import io.github.jorelali.commandapi.api.arguments.GreedyStringArgument;
+import io.github.jorelali.commandapi.api.arguments.LiteralArgument;
 
 public class Main extends JavaPlugin implements Listener {
 
@@ -27,12 +24,43 @@ public class Main extends JavaPlugin implements Listener {
 
 	@Override
 	public void onLoad() {
+		
 
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		CommandAPI.getInstance().register("broadcastmsg", CommandPermission.OP, arguments, (sender, args) -> {
-			Bukkit.broadcastMessage("hello");
+		tests = new LinkedHashMap<>();
+		Arrays.stream(Tests.getTests()).forEach(t -> tests.put(t, Status.PENDING));
+		
+		tests.forEach((t, status) -> {
+			t.register.accept(CommandAPI.getInstance(), new LinkedHashMap<>());
 		});
-
+		
+		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
+		arguments.put("option", new LiteralArgument("list"));
+		CommandAPI.getInstance().register("tests", arguments, (sender, args) -> {
+			sender.sendMessage("--- Tests ----------");
+			tests.forEach((t, status) -> {
+				ChatColor c = null;
+				switch(status) {
+					case FAILED:
+						c = ChatColor.RED;
+						break;
+					case PASSED:
+						c = ChatColor.GREEN;
+						break;
+					case PENDING:
+						c = ChatColor.GRAY;
+						break;
+				}
+				
+//				sender.sendMessage(c + " " + t.description);
+				sender.sendMessage("--------------------------");
+			});
+		});
+		
+		arguments.clear();
+		arguments.put("command", new GreedyStringArgument());
+		CommandAPI.getInstance().register("run", arguments, (sender, args) -> {
+			Bukkit.dispatchCommand(sender, (String) args[0]);
+		});
 	}
 	
 	public CustomArgument<Objective> getObjectiveCustomArgWithDefaultException() {
@@ -66,35 +94,6 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {
-		tests = new LinkedHashMap<>();
-		Arrays.stream(Tests.getTests()).forEach(t -> tests.put(t, Status.PENDING));
-		
-		tests.forEach((t, status) -> {
-			t.register.accept(CommandAPI.getInstance(), new LinkedHashMap<>());
-		});
-		
-		LinkedHashMap<String, Argument> arguments = new LinkedHashMap<>();
-		arguments.put("option", new LiteralArgument("list"));
-		CommandAPI.getInstance().register("tests", arguments, (sender, args) -> {
-			sender.sendMessage("--- Tests ----------");
-			tests.forEach((t, status) -> {
-				ChatColor c = null;
-				switch(status) {
-					case FAILED:
-						c = ChatColor.RED;
-						break;
-					case PASSED:
-						c = ChatColor.GREEN;
-						break;
-					case PENDING:
-						c = ChatColor.GRAY;
-						break;
-				}
-				
-				sender.sendMessage(c + " " + t.testRequirements);
-				sender.sendMessage("--------------------------");
-			});
-		});
 		
 		
 		
@@ -119,34 +118,34 @@ public class Main extends JavaPlugin implements Listener {
 //		CraftLootTable a = new CraftLootTable(new NamespacedKey(ka.b(), ka.getKey()), MinecraftServer.getServer().getLootTableRegistry().getLootTable(null));
 		
 		
-		arguments.put("sugstr", new SuggestedStringArgument("hello", "world"));
-		CommandAPI.getInstance().register("suggest", arguments, (sender, args) -> {
-			sender.sendMessage((String) args[0]);
-		});
-		
-		arguments.clear();
-		arguments.put("newstr", new StringArgument().overrideSuggestions("hello", "world"));
-		CommandAPI.getInstance().register("suggest2", arguments, (sender, args) -> {
-			sender.sendMessage((String) args[0]);
-		});
-		
-		arguments.clear();
-		arguments.put("cust", getObjectiveCustomArgWithDefaultException());
-		CommandAPI.getInstance().register("cust", arguments, (sender, args) -> {
-			sender.sendMessage(((Objective) args[0]).getName());
-		});
-		
-		arguments.clear();
-		arguments.put("cust", getObjectiveCustomArg());
-		CommandAPI.getInstance().register("cust1", arguments, (sender, args) -> {
-			sender.sendMessage(((Objective) args[0]).getName());
-		});
-		
-		arguments.clear();
-		arguments.put("cust", getObjectiveCustomArgWithFail());
-		CommandAPI.getInstance().register("cust2", arguments, (sender, args) -> {
-			sender.sendMessage(((Objective) args[0]).getName());
-		});
+//		arguments.put("sugstr", new SuggestedStringArgument("hello", "world"));
+//		CommandAPI.getInstance().register("suggest", arguments, (sender, args) -> {
+//			sender.sendMessage((String) args[0]);
+//		});
+//		
+//		arguments.clear();
+//		arguments.put("newstr", new StringArgument().overrideSuggestions("hello", "world"));
+//		CommandAPI.getInstance().register("suggest2", arguments, (sender, args) -> {
+//			sender.sendMessage((String) args[0]);
+//		});
+//		
+//		arguments.clear();
+//		arguments.put("cust", getObjectiveCustomArgWithDefaultException());
+//		CommandAPI.getInstance().register("cust", arguments, (sender, args) -> {
+//			sender.sendMessage(((Objective) args[0]).getName());
+//		});
+//		
+//		arguments.clear();
+//		arguments.put("cust", getObjectiveCustomArg());
+//		CommandAPI.getInstance().register("cust1", arguments, (sender, args) -> {
+//			sender.sendMessage(((Objective) args[0]).getName());
+//		});
+//		
+//		arguments.clear();
+//		arguments.put("cust", getObjectiveCustomArgWithFail());
+//		CommandAPI.getInstance().register("cust2", arguments, (sender, args) -> {
+//			sender.sendMessage(((Objective) args[0]).getName());
+//		});
 		
 //		arguments.put("target", new PlayerArgument());
 //		CommandAPI.getInstance().register("mycmd", arguments, (sender, args) -> {
@@ -165,18 +164,18 @@ public class Main extends JavaPlugin implements Listener {
 //			((Location) args[0]).getBlock().setType(Material.AIR);
 //		});
 //		
-		arguments.clear();
+//		arguments.clear();
 //		arguments.put("pos", new LocationArgument(LocationType.PRECISE_POSITION));
 //		CommandAPI.getInstance().register("getpos", arguments, (sender, args) -> {
 //			sender.sendMessage(((Location) args[0]).toString());
 //		});
 		
 		
-		CommandAPI.getInstance().register("fly", arguments, (sender, args) -> {
-			if (sender instanceof Player) {
-				((Player) sender).setFlying(true);
-			}
-		});
+//		CommandAPI.getInstance().register("fly", arguments, (sender, args) -> {
+//			if (sender instanceof Player) {
+//				((Player) sender).setFlying(true);
+//			}
+//		});
 
 //		CommandAPI.getInstance().register("", null, (sender, args) -> {
 //		});
