@@ -1,0 +1,8 @@
+name: CommandApiTest
+main: io.github.jorelali.cmdapitest.Main
+version: 1.0
+description: Performs tests
+author: Skepter
+website: http://jorelali.github.io/
+
+depend: [CommandAPI]
